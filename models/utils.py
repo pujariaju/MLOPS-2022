@@ -1,29 +1,11 @@
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from joblib import dump
-from sklearn import svm,tree
-from sklearn.metrics import f1_score
-import pdb
-import os
-best_model_path1=''
-
-def get_all_combs(param_vals, param_name, combs_so_far):
-    new_combs_so_far = []        
-    for c in combs_so_far:        
-        for v in param_vals:
-            cc = c.copy()
-            cc[param_name] = v
-            new_combs_so_far.append(cc)
-    return new_combs_so_far
+from sklearn import svm
 
 
 def get_all_h_param_comb(params):
-    h_param_comb = [{}]
-    for p_name in params:
-        h_param_comb = get_all_combs(
-            param_vals=params[p_name], param_name=p_name, combs_so_far=h_param_comb
-        )
-
+    h_param_comb = [{"gamma": g, "C": c} for g in params['gamma'] for c in params['C']]
     return h_param_comb
     
 def preprocess_digits(dataset):
@@ -62,14 +44,14 @@ def pred_image_viz(x_test, predictions):
 # dev to set hyperparameters of the model
 # test to evaluate the performance of the model
 
-def train_dev_test_split(data, label, train_frac,random_state, dev_frac):
+def train_dev_test_split(data, label, train_frac, dev_frac):
 
     dev_test_frac = 1 - train_frac
     x_train, x_dev_test, y_train, y_dev_test = train_test_split(
-        data, label, test_size=dev_test_frac,random_state=42, shuffle=True
+        data, label, test_size=dev_test_frac, shuffle=True
     )
     x_test, x_dev, y_test, y_dev = train_test_split(
-        x_dev_test, y_dev_test, test_size=(dev_frac) / dev_test_frac,random_state=42, shuffle=True
+        x_dev_test, y_dev_test, test_size=(dev_frac) / dev_test_frac, shuffle=True
     )
 
     return x_train, y_train, x_dev, y_dev, x_test, y_test
@@ -117,14 +99,11 @@ def tune_and_save(clf, x_train, y_train, x_dev, y_dev, metric, h_param_comb, mod
     best_param_config = "_".join([h + "=" + str(best_h_params[h]) for h in best_h_params])
     
     if type(clf) == svm.SVC:
-        model_type = "svm"
+        model_type = 'svm' 
 
-    if type(clf) == tree.DecisionTreeClassifier:
-        model_type = "decision_tree"
-
-    path11 = "/home/apujari/MLOPS-2022/models/"
-    best_model_name = path11 + model_type + "_" + best_param_config + ".joblib"
-    model_path = best_model_name
+    best_model_name = model_type + "_" + best_param_config + ".joblib"
+    if model_path == None:
+        model_path = best_model_name
     dump(best_model, model_path)
 
     print("Best hyperparameters were:")
@@ -133,5 +112,3 @@ def tune_and_save(clf, x_train, y_train, x_dev, y_dev, metric, h_param_comb, mod
     print("Best Metric on Dev was:{}".format(best_metric))
 
     return model_path
-def macro_f1(y_true, y_pred, pos_label=1):
-    return f1_score(y_true, y_pred, pos_label=pos_label, average='macro', zero_division='warn')

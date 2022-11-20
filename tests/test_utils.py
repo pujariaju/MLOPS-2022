@@ -1,12 +1,12 @@
 import sys, os
 import numpy as np
 from joblib import load
+sys.path.append('/home/apujari/MLOPS-2022/')
+#sys.path.append(".")
 
-
-sys.path.append(".")
-
-from utils import get_all_h_param_comb, tune_and_save
 from sklearn import svm, metrics
+from models.utils import get_all_h_param_comb, tune_and_save
+
 
 # test case to check if all the combinations of the hyper parameters are indeed getting created
 def test_get_h_param_comb():
