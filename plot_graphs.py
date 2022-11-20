@@ -6,6 +6,7 @@
 
 # Import datasets, classifiers and performance metrics
 from sklearn import datasets, svm, metrics
+from joblib import dump
 import pdb
 
 from utils import (
@@ -63,7 +64,7 @@ best_model = load(actual_model_path)
 # PART: Get test set predictions
 # Predict the value of the digit on the test subset
 predicted = best_model.predict(x_test)
-
+dump(best_model, f'models/{best_model}')
 pred_image_viz(x_test, predicted)
 
 # 4. report the test set accurancy with that best model.
